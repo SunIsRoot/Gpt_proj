@@ -1,8 +1,9 @@
-from langchain_openai import ChatOpenAI,OpenAIEmbeddings
-from langchain_community.document_loaders import TextLoader
+from langchain.chat_models import ChatOpenAI
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import CacheBackedEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain.vectorstores import FAISS
 from langchain.storage import LocalFileStore
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough,RunnableLambda
@@ -10,6 +11,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.callbacks.base import BaseCallbackHandler
 import streamlit as st
+import os
 
 
 page_title="DocumentGPT"
@@ -41,10 +43,12 @@ llm = ChatOpenAI(
 @st.cache_resource(show_spinner="Embedding file...")
 def embed_file(file):
     file_content = file.read()
-    file_path = f"./.cache/files/{file.name}"
+    os.makedirs("./.cache/files", exist_ok=True)
+    os.makedirs("./.cache/embeddings", exist_ok=True)
+    file_path = f"./.cache/files/{os.path.basename(file.name)}"
     with open(file_path, "wb") as file:
         file.write(file_content)
-    cache_dir = LocalFileStore(f"./.cache/embeddings/{file.name}")
+    cache_dir = LocalFileStore(f"./.cache/embeddings/{os.path.basename(file.name)}")
     splitter = CharacterTextSplitter.from_tiktoken_encoder(
         separator="\n",
         chunk_size=600,

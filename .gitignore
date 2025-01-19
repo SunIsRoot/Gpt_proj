@@ -1,6 +1,4 @@
-
 env/
 .env
 document.txt
 .streamlit
-.cache
