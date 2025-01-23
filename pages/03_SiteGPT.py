@@ -150,11 +150,10 @@ st.markdown(
 with st.sidebar:
     url = "https://developers.cloudflare.com/sitemap.xml"
     openai_api_key = st.text_input("Input your OpenAI API Key", type="password")
-
     if openai_api_key:
         llm = ChatOpenAI(
             temperature=0.1,
-            streaming=True,
+            streaming=False,
             callbacks=[ChatCallbackHandler()],
             openai_api_key=openai_api_key,
         )
@@ -170,7 +169,7 @@ with st.sidebar:
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-send_message("I'm familiar with the document, feel free to ask questions", "ai", save=False)
+send_message("I'm familiar with the Cloudflare developers website, feel free to ask questions", "ai", save=False)
 paint_history()
 message = st.chat_input("Ask anything about the Cloudflare developers website.")
 
@@ -188,7 +187,6 @@ if message:
     with st.chat_message("ai"):
         result = chain.invoke(message)
         memory.save_context({"input": message}, {"output": result.content})
-
-    st.markdown(result.content.replace("$", "\$"))
+        st.markdown(result.content.replace("$", "\$"))
 else:
     st.session_state["messages"] = []
